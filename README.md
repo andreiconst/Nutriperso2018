@@ -29,7 +29,7 @@ In the Second one, it is the same data but same where households have not been d
 
 ### products_clustering_table.py
 * Inputs : produits_achats.csv
-* Outputs : Clutering mano.csv, Clustering_auto.csv
+* Outputs : Clutering mano.csv, Clustering_auto.csv (currently does not work, needs debugging)
 
 Clutering mano : clustering of products using manually selected relevant features for each category. The clustering yields circa 4,000 product-clusters. It outputs the file cluster_products_mano.csv<br />
 
