@@ -12,8 +12,8 @@ Before starting any analysis, note that the data folder is empty. Please put in 
 There are 5 files of interest, 4 that should be run in the following order + one of different tools and functions. <br />
 
 ### products_creation_table.py
-__**Inputs : achat_2014.csv<br />**__<br />
-__**Outputs : achat_2014cleaned.csv, produits_achats.csv<br />__**
+__Inputs : achat_2014.csv<br />__<br />
+__Outputs : achat_2014cleaned.csv, produits_achats.csv<br />__
 
 The data does not include as such any information about products. This  information if hidden in the purchase data(achat_2014.csv). So each time a product appears in a purchase, it is followed by its full description.<br />
 
