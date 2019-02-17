@@ -43,10 +43,8 @@ Clustering_auto.csv : clustering of features using an automatic selection of fea
 
 This code serves to create from the initial purchase data (where each line is a purchase) the full purchase matrix. This comes in the form of a sparse matrix – which is in our opinion the best way to store the data. Thus, each time 3 files will be created : the purchase matrix itself, the names of the rows, and the names of the columns. Although according to the granularity of the data, the name of the rows will change, the name of the columns (products) should stay the same, i.e. be the 170,000 product codes. Here are the different options for the granularity:<br />
 
-- Yearly aggregation: each row is a household, and the row-vectors represent the yearly purchases of the household (purchase_table_full)<br />
-
+- Yearly aggregation: each row is a household, and the row-vectors represent the yearly purchases of the household (purchase_table_full)
 - Monthly / weekly aggregation : each row is a household and a month, and the row-vectors represent the monthly / weekly purchases of the household (purchase_table_full_weekly, purchase_table_full_monthly)
-<br />
 - Basket aggregation: this is the finest level of granularity we have achieved. Each row is a basket, combining all the products one houshehold has purchased in one time (purchase_table_codepanier).<br />
 
 The data is saved in the npz format, a format especially suitable for sparse matrices.
