@@ -47,5 +47,5 @@ This code serves to create from the initial purchase data (where each line is a 
 - Monthly / weekly aggregation : each row is a household and a month, and the row-vectors represent the monthly / weekly purchases of the household (purchase_table_full_weekly, purchase_table_full_monthly)
 - Basket aggregation: this is the finest level of granularity we have achieved. Each row is a basket, combining all the products one houshehold has purchased in one time (purchase_table_codepanier).<br />
 
-The data is saved in the npz format, a format especially suitable for sparse matrices.
+The data is saved in the npz format - for sparse matrices.
 
