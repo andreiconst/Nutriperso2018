@@ -1,0 +1,30 @@
+csp_code,csp_intitule
+10,Agriculteurs exploitants
+21,Artisans
+22,Commerçants et assimilés
+23,Chefs d'entreprises
+31,Professions libérales
+35,Professions de l'information et des spectacles
+36,Cadres d'entreprises - Ingénieurs
+39,Cadres de la fonction publique - Professeurs - Professions scientifiques
+41,Instituteurs - Professions de la santé et du travail social - Clergé - Professions administratives
+46,Professions administratives et commerciales des entreprises
+47,Techniciens
+48,Contremaîtres - Agents de maîtrise
+52,Employés civils et agents de service de la fonction publique
+53,Policiers et militaires
+54,Employés administratifs d'entreprises
+55,Employés de commerce
+56,Personnels des services directs aux particuliers
+60,Ouvriers qualifiés
+64,Chauffeurs
+66,Ouvriers non qualifiés
+69,Ouvriers agricoles
+71,Anciens agriculteurs exploitants
+72,"Anciens artisans, commerçants, chefs d'entreprises"
+73,Anciens cadres et professions intermédiaires
+76,Anciens employés et ouvriers
+81,Chômeurs n'ayant jamais travaillé
+83,Militaires du contingent
+84,"Elèves, étudiants de 15 ans et plus "
+87,Personnes diverses sans activité professionnelle

@@ -7,20 +7,121 @@ Created on Tue Apr  3 17:15:24 2018
 @author: andrei
 """
 
-from scipy.stats import ks_2samp
 import pandas as pd
 import numpy as np
 import string
 printable = set(string.printable)
 import matplotlib.pyplot as  plt
 import sys
-sys.path.insert(0, '/home/andrei/Desktop/kantar_2014/code_produits/')
+import os
+sys.path.insert(0, os.getcwd() + '/Preprocessing')
 from tools_clustering import *
+
+
+# =============================================================================
+# Run clustering mano
+# =============================================================================
+
+
+products_table = pd.read_csv(os.getcwd() + '/data/produits_achats.csv')
+dict_qval = create_dict_val_qvol(products_table)
+products_table = clean_table(products_table)
+
+
+products_table = products_table.drop(columns=['valqvol'])
+sousgroupes = sorted(list(set(products_table['sousgroupe'])))
+
+dict_to_keep = create_dict_to_keep(sousgroupes)
+clusters = clustering_algo_full_mano(products_table, sousgroupes, dict_to_keep,dict_qval)
+
+
+clustered_datatable = create_pruned_datatable(products_table, clusters)
+
+
+# =============================================================================
+# Run automatic clusteing
+# =============================================================================
+
+'''
+cols_to_drop = ['fabricant', 'marque'] # 
+
+clusters1 = clustering_algo_simple_all(products_table, sousgroupes, cols_to_drop, dict_qval)  
+result1 = count_clusters(clusters1)
+
+clusters2 = clustering_algo_simple_all(products_table, sousgroupes, cols_to_drop, dict_qval, cluster_dict = clusters1, advanced = True)  
+result2 = count_clusters(clusters2)  
+              
+merged_clusters = merge_clusters(products_table, clusters1, clusters2)
+clustered_datatable = create_pruned_datatable(products_table, merged_clusters)
+'''
+
+
+# =============================================================================
+# Last checks and prints
+# =============================================================================
+assert np.sum(products_table['count']) == compute_total_count(clustered_datatable)
+
+
+pruned_products = pruned_clusters(clustered_datatable, 10)
+
+final_dataframe = create_dataframe(pruned_products)
+final_dataframe.to_csv('data/cluster_products_mano.csv', index = False)
+
+
+
+
+
+
+
+'''
+groupe_info1 = products_table[['groupe', 'sousgroupe']].loc[products_table['product'].isin(pruned_products.keys())].groupby('groupe').count()
+groupe_info2 = products_table[['groupe', 'count']].loc[products_table['product'].isin(pruned_products.keys())].groupby('groupe').sum()
+groupe_info = pd.merge(groupe_info1, groupe_info2, left_index=True, right_index=True)
+groupe_info.to_csv('info_groupes_cluster_mano.csv')
+
+
+sousgroupe_info1 = products_table[['groupe', 'sousgroupe']].loc[products_table['product'].isin(pruned_products.keys())].groupby('sousgroupe').count()
+sousgroupe_info2 = products_table[['sousgroupe', 'count']].loc[products_table['product'].isin(pruned_products.keys())].groupby('sousgroupe').sum()
+sousgroupe_info = pd.merge(sousgroupe_info1, sousgroupe_info2, left_index=True, right_index=True)
+sousgroupe_info.to_csv('info_sousgroupes_cluster_mano.csv')
+
+'''
+
+
+
+
+
+# =============================================================================
+# Table subset chosen features
+# =============================================================================
+'''
+
+table_variables = list()
+for key in dict_to_keep:
+    temp = list()
+    for l in dict_to_keep[key]:
+        if (l[:2] == 'v_'):
+            new_l = 'c_' + l[2:]
+            value = products_table[new_l].loc[products_table['sousgroupe'] == key].reset_index().loc[0].values[1]
+            temp.append(value)
+        elif (l[:3] == 'vn_'):
+            new_l = 'cn_' + l[3:]
+            value = products_table[new_l].loc[products_table['sousgroupe'] == key].reset_index().loc[0].values[1]
+            temp.append(value)  
+        else:
+            temp.append(l)
+    table_variables.append([key, temp])
+
+table_variables = pd.DataFrame(table_variables)
+table_variables.to_csv('table_variables_clustering_mano.csv')
+
+
+'''
 
 # =============================================================================
 # Plot 1 : consumption habits ppl
 # =============================================================================
-
+'''
 full_table = pd.read_csv('data/achat_2014cleaned.csv')
 products_table = pd.read_csv('data_cleaned/produits_achats.csv')
 
@@ -54,13 +155,14 @@ plt.title('Distribution du nombre de centrales achat par foyer')
 plt.xlabel('Nombre centrale achat')
 plt.ylabel('Nombre de foyers')
 plt.savefig('analyse_purchases/hist_centrales_achats.png')
+'''
 
 # =============================================================================
 # Plot 2 : different distributors as different universes
 # =============================================================================
 
 #idee chaque centrale achat est un univers
-
+'''
 table_centrale_products_original = full_table[['centraleachat', 'product']].loc[full_table['centraleachat'].isin(centrales)].drop_duplicates()
 table_centrale_products = table_centrale_products_original.groupby(['product']).count().reset_index()
 table_centrale_products_ones = list(table_centrale_products['product'].loc[table_centrale_products['centraleachat'] == 1])
@@ -83,23 +185,23 @@ unique_products_centrale =  full_table[['centraleachat', 'product']].loc[(full_t
 products_unique_centrale = products_table.loc[products_table['product'].isin(table_centrale_products_ones)]
 products_unique_centrale = pd.merge(products_unique_centrale, unique_products_centrale, left_on = 'product', right_on = 'product')
 
-
+'''
 
 
 # =============================================================================
 # Pdm distributeurs
 # =============================================================================
-
+'''
 centrale_code = full_table[['centraleachat', 'codeshopachat', 'codepanier']].groupby(['centraleachat', 'codeshopachat']).count().reset_index()
 
 pdm_distributeurs = full_table[['centraleachat', 'codepanier']].loc[full_table['centraleachat'].isin(centrales)].groupby(['centraleachat']).count()
 
-
+'''
 
 # =============================================================================
 # How to aggregate by centraleachat ?
 # =============================================================================
-
+'''
 # doing some experiments
 
 unique_products_full = pd.merge(products_table, unique_products_centrale, left_on = 'product', right_on = 'product')
@@ -168,7 +270,6 @@ pairs_common = list(set(pairs_331).intersection(set(pairs_439)))
 
 
 
-
 counter = 0    
 products_table = pd.read_csv('data/produits_achats.csv', encoding='latin1')
 dict_qval = create_dict_val_qvol(products_table)
@@ -190,88 +291,8 @@ count_cl = count_clustering_numbers(clustering_sousgroupe, subset, table_central
 
 
 test = subset.loc[subset['product'].isin(count_cl[1][1])]
-# =============================================================================
-# Run clustering mano
-# =============================================================================
 
-products_table_mdd = products_table.loc[products_table['mdd'] == 'Oui'] 
-sousgroupes_mdd = sorted(list(set(products_table['sousgroupe'].loc[products_table['mdd'] == 'Oui'])))
-
-clusters = clustering_algo_full_mano(products_table_mdd, sousgroupes_mdd, dict_to_keep,dict_qval)
-
-
-
-
-
-clustered_datatable = create_pruned_datatable(products_table, clusters)
-
-
-# =============================================================================
-# Run automatic clusteing
-# =============================================================================
-
-clusters1 = clustering_algo_simple_all(products_table, sousgroupes, cols_to_drop)  
-result1 = count_clusters(clusters1)
-
-clusters2 = clustering_algo_simple_all(products_table, sousgroupes, cols_to_drop, cluster_dict = clusters1, advanced = True)  
-result2 = count_clusters(clusters2)  
-              
-merged_clusters = merge_clusters(clusters1, clusters2)
-clustered_datatable = create_pruned_datatable(products_table, merged_clusters)
-
-
-
-# =============================================================================
-# Last checks and prints
-# =============================================================================
-assert np.sum(products_table['count']) == compute_total_count(clustered_datatable)
-
-
-pruned_products = pruned_clusters(clustered_datatable, 100)
-
-final_dataframe = create_dataframe(pruned_products)
-final_dataframe.to_csv('data/cluster_products_mano100.csv', index = False)
-
-groupe_info1 = products_table[['groupe', 'sousgroupe']].loc[products_table['product'].isin(pruned_products.keys())].groupby('groupe').count()
-groupe_info2 = products_table[['groupe', 'count']].loc[products_table['product'].isin(pruned_products.keys())].groupby('groupe').sum()
-groupe_info = pd.merge(groupe_info1, groupe_info2, left_index=True, right_index=True)
-groupe_info.to_csv('info_groupes_cluster_mano.csv')
-
-
-sousgroupe_info1 = products_table[['groupe', 'sousgroupe']].loc[products_table['product'].isin(pruned_products.keys())].groupby('sousgroupe').count()
-sousgroupe_info2 = products_table[['sousgroupe', 'count']].loc[products_table['product'].isin(pruned_products.keys())].groupby('sousgroupe').sum()
-sousgroupe_info = pd.merge(sousgroupe_info1, sousgroupe_info2, left_index=True, right_index=True)
-sousgroupe_info.to_csv('info_sousgroupes_cluster_mano.csv')
-
-
-
-
-
-
-
-
-# =============================================================================
-# Table subset chosen features
-# =============================================================================
-
-table_variables = list()
-for key in dict_to_keep:
-    temp = list()
-    for l in dict_to_keep[key]:
-        if (l[:2] == 'v_'):
-            new_l = 'c_' + l[2:]
-            value = products_table[new_l].loc[products_table['sousgroupe'] == key].reset_index().loc[0].values[1]
-            temp.append(value)
-        elif (l[:3] == 'vn_'):
-            new_l = 'cn_' + l[3:]
-            value = products_table[new_l].loc[products_table['sousgroupe'] == key].reset_index().loc[0].values[1]
-            temp.append(value)  
-        else:
-            temp.append(l)
-    table_variables.append([key, temp])
-
-table_variables = pd.DataFrame(table_variables)
-table_variables.to_csv('table_variables_clustering_mano.csv')
+'''
 
 
 

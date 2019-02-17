@@ -9,13 +9,12 @@ Created on Fri Apr 20 14:57:34 2018
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
-import matplotlib.pyplot as plt
 
 
 
 
 products_table = pd.read_csv('data/produits_achats.csv', encoding='latin1')
-
+full_table = pd.read_csv('data/achat_2014cleaned.csv', encoding='latin1')
 
 def create_dict_table(datatable, header):
     result = dict()
@@ -89,18 +88,6 @@ def transform_aggregated_datatable(datatable, var1, var2, val, sparse = False):
         return result_final, list_var1, list_var2
 
         
-indexes_weird = np.where(result_final.data > 100)
-result_final = result_final.tocoo()
-result_final.col[indexes_weird[0]]
-result_final.row[indexes_weird[0][1]]
-
-for i in indexes_weird[0]:
-    print(list_var1[result_final.row[i]])
-
-
-
-datable_weeks = transform_aggregated_datatable(full_table, 'household', 'semaine', 'codepanier')
-datable_centrale = transform_aggregated_datatable(full_table, 'household', 'circuit','codepanier')
 datatable_purchases, hh, products = transform_aggregated_datatable(full_table, 'household', 'product', 'qaachat', sparse = True)
 datatable_purchases_weekly, hh_and_weeks, products_week = transform_aggregated_datatable(full_table, ['household', 'semaine'], 'product', 'qaachat', sparse = True)
 datatable_purchases_month, hh_and_month, products_month = transform_aggregated_datatable(full_table, ['household', ':eriode'], 'product', 'qaachat', sparse = True)
@@ -126,10 +113,6 @@ def save_purchase_matrix(filename_matrix, sparse_matrix, filename_rows, rows_lis
     
 
 
-
-datable_weeks.to_csv('data_cleaned/household_activity_week.csv')
-datable_centrale.to_csv('data_cleaned/household_activity_circuit.csv')
-
 save_purchase_matrix('purchase_table_full', datatable_purchases, 'households_matrix_full.txt', hh, 'products_matrix_full.txt', products)
 save_purchase_matrix('purchase_table_full_weekly', datatable_purchases_weekly, 'households_week_matrix_full.txt', hh_and_weeks, 'products_matrix_full_weekly.txt', products)
 save_purchase_matrix('purchase_table_full_monthly', datatable_purchases_month, 'households_month_matrix_full.txt', hh_and_month, 'products_matrix_full_month.txt', products_month)
@@ -139,7 +122,7 @@ save_purchase_matrix('purchase_table_codepanier', datatable_purchases_cp, 'house
 # =============================================================================
 # Run some tests, do not pay attention
 # =============================================================================
-
+'''
 # Same distribution ??
 
 products.index('154')
@@ -164,3 +147,4 @@ norm1 = np.sqrt(np.dot(datatable_purchases[:,product1].T, datatable_purchases[:,
 norm2 = np.sqrt(np.dot(datatable_purchases[:,product2].T, datatable_purchases[:,product2])[0,0])
 
 dot_product = np.dot(datatable_purchases[:,product1].T, datatable_purchases[:,product2])[0,0] / (norm1 * norm2)
+'''

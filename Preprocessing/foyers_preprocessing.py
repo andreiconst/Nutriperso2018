@@ -11,8 +11,10 @@ import re
 import pandas as pd
 import numpy as np
 import string
+import os
 
-households = pd.read_csv('data/menages_2014.csv', sep=";", encoding='latin1')
+curdir = os.getcwd()
+households = pd.read_csv(curdir + '/data/menages_2014.csv', sep=";", encoding='latin1')
 printable = set(string.printable)
 
 # =============================================================================
@@ -332,7 +334,7 @@ assert compute_value_columns(households, headers_sex, 2) == len(households_final
 # =============================================================================
 
 households_final.to_csv('data/foyers_traites.csv', index = False)
-
+households_trimed.to_csv('data/foyers_dedupliques.csv', index = False)
 
 
 
