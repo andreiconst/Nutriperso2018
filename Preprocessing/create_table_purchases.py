@@ -103,12 +103,12 @@ def save_sparse_csr(filename, array):
 def save_purchase_matrix(filename_matrix, sparse_matrix, filename_rows, rows_list):
     
 
-    save_sparse_csr('data_cleaned/' + filename_matrix, sparse_matrix)
+    save_sparse_csr('data/' + filename_matrix, sparse_matrix)
 
 
     hh = [str(h) for h in rows_list]
     
-    with open('data_cleaned/' + filename_rows,'w') as f:
+    with open('data/' + filename_rows,'w') as f:
         f.write(','.join(hh))
     
 

@@ -12,73 +12,33 @@ import pandas as pd
 import numpy as np
 import csv
 
-'''
-Input:
-    1. name products
-    2. name households
-    3. topic table (products x topics)
-    4. topic distribution table (households x topics)
+sys.path.insert(0, os.getcwd() + '/Tools/')
+from lda_interpretation__bis import *
 
-'''
 
-name_products = 'products_lda.txt'
-name_households = 'household_lda.txt'
-lda_topics_name = 'topics_lda_original.csv'
-lda_topics_distribution_name = 'documents_lda_mano.csv'
+lda_documents_name = 'documents_lda_auto.csv'
+lda_topics_name = 'topics_lda_auto.csv'
 nb_topics = 30
 
 
+lda_topics = pd.read_csv('data/' + lda_topics_name, index_col = 0)
+lda_documents = pd.read_csv('data/' + lda_documents_name)
 
-#load tables
+liste_produits = lda_topics.index.tolist()
+list_households = lda_documents.index.tolist()
 
-def clean_table(datatable):
-    #datatable = datatable.drop(['Unnamed: 0'], axis = 1)
-    datatable = datatable.reset_index(drop=True)
-    
-    groupes = sorted(list(set(datatable['groupe'])))
-    sousgroupes = sorted(list(set(datatable['sousgroupe'])))
-    
-    datatable['sousgroupe'].loc[(datatable['sousgroupe'] == sousgroupes[168]) & (datatable['groupe']== groupes[23])] = 'Pate_pate'
-    datatable['sousgroupe'].loc[(datatable['sousgroupe'] == sousgroupes[168]) & (datatable['groupe']== groupes[8])] = 'Pate_charcuterie'
-    
-        
-    return datatable
 
-def import_products():
-    with open('data/' + name_products, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        for row in reader:
-             liste_produits = row
-    liste_produits = [int(p) for p in liste_produits]
-    return liste_produits
-
-def import_households(list_columns):
-    with open('data/' + name_households, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        for row in reader:
-             liste_households = row
-    liste_households = [int(h) for h in liste_households]
-    households = pd.read_csv('data/foyers_traites.csv')
-    households = households.loc[households['household'].isin(liste_households)]
-    households = households[list_columns].drop_duplicates()
-    return liste_households, households
-
-liste_produits = import_products()
 products_table = pd.read_csv('data/produits_achats.csv',encoding = "latin1")
 products_table = clean_table(products_table)
 products_table = products_table.loc[products_table['product'].isin(liste_produits)]
-#sousgroupes = list(products_table['sousgroupe'].drop_duplicates())
-#marques_et_fabricants = list(products_table['fabricant'].drop_duplicates())
 
 
-lda_households = pd.read_csv('data/' + lda_topics_distribution_name)
-lda_households = np.asarray(lda_households)
+lda_households = np.asarray(lda_documents)
+lda_products = np.asarray(lda_topics)
 
-lda_products = pd.read_csv('data/' + lda_topics_name)
-lda_products = np.asarray(lda_products)
-
-list_households, households = import_households(['household','dpts','thab'])
-
+households = pd.read_csv('data/foyers_traites.csv')
+households = households.loc[households['household'].isin(list_households)]
+households = households[['household','dpts','thab']].drop_duplicates()
 
 # =============================================================================
 # link topics with demographic variables (heatmap)
@@ -219,6 +179,6 @@ def represent_sousgroupe(lda_table, max_dim=10):
     return pd.DataFrame(list_final).transpose()
 
      
-table_sousgroupes = represent_sousgroupe(lda_products, max_dim=20)
-table_sousgroupes.to_csv('Reunions/sousgroupes_lda_topics.csv', index=False)
-    
+table_sousgroupes = represent_sousgroupe(lda_products.T, max_dim=20)
+table_sousgroupes.to_csv('sousgroupes_lda_topics.csv', index=False)
+

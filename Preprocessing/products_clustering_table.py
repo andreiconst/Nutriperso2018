@@ -14,14 +14,12 @@ printable = set(string.printable)
 import matplotlib.pyplot as  plt
 import sys
 import os
-sys.path.insert(0, os.getcwd() + '/Preprocessing')
+sys.path.insert(0, os.getcwd() + '/Tools')
 from tools_clustering import *
 
-
 # =============================================================================
-# Run clustering mano
+# Loading and cleaning data
 # =============================================================================
-
 
 products_table = pd.read_csv(os.getcwd() + '/data/produits_achats.csv')
 dict_qval = create_dict_val_qvol(products_table)
@@ -31,19 +29,23 @@ products_table = clean_table(products_table)
 products_table = products_table.drop(columns=['valqvol'])
 sousgroupes = sorted(list(set(products_table['sousgroupe'])))
 
+# =============================================================================
+# Run clustering mano
+# =============================================================================
+
+
 dict_to_keep = create_dict_to_keep(sousgroupes)
 clusters = clustering_algo_full_mano(products_table, sousgroupes, dict_to_keep,dict_qval)
 
 
-clustered_datatable = create_pruned_datatable(products_table, clusters)
+clustered_datatable_mano = create_pruned_datatable(products_table, clusters)
 
 
 # =============================================================================
 # Run automatic clusteing
 # =============================================================================
 
-'''
-cols_to_drop = ['fabricant', 'marque'] # 
+cols_to_drop = ['fabricant', 'marque', 'codeqvol', 'count'] # 
 
 clusters1 = clustering_algo_simple_all(products_table, sousgroupes, cols_to_drop, dict_qval)  
 result1 = count_clusters(clusters1)
@@ -52,20 +54,26 @@ clusters2 = clustering_algo_simple_all(products_table, sousgroupes, cols_to_drop
 result2 = count_clusters(clusters2)  
               
 merged_clusters = merge_clusters(products_table, clusters1, clusters2)
-clustered_datatable = create_pruned_datatable(products_table, merged_clusters)
-'''
+clustered_datatable_auto = create_pruned_datatable(products_table, merged_clusters)
 
 
 # =============================================================================
 # Last checks and prints
 # =============================================================================
-assert np.sum(products_table['count']) == compute_total_count(clustered_datatable)
+assert np.sum(products_table['count']) == compute_total_count(clustered_datatable_mano)
+assert np.sum(products_table['count']) == compute_total_count(clustered_datatable_auto)
 
 
-pruned_products = pruned_clusters(clustered_datatable, 10)
 
-final_dataframe = create_dataframe(pruned_products)
+pruned_products_mano = pruned_clusters(clustered_datatable_mano, 10)
+pruned_products_auto = pruned_clusters(clustered_datatable_auto, 10)
+
+
+final_dataframe = create_dataframe(pruned_products_mano)
 final_dataframe.to_csv('data/cluster_products_mano.csv', index = False)
+
+final_dataframe = create_dataframe(pruned_products_auto)
+final_dataframe.to_csv('data/cluster_products_auto.csv', index = False)
 
 
 

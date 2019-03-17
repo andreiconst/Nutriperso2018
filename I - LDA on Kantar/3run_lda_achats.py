@@ -15,33 +15,32 @@ import pandas as pd
 
 
 import sys
-sys.path.insert(0, '/home/andrei/Desktop/kantar_2014/code_foyers/')
-sys.path.insert(0, '/home/andrei/Desktop/kantar_2014/code_produits/')
+import os
+sys.path.insert(0, os.getcwd() + '/Tools/')
 
 from draw_graphs_households import *
 from tools_regression import *
 from tools_clustering import *
 from tools_preprocessing import *
 
-households = import_and_transform_households('data_cleaned/foyers_traites.csv')
-week_table = import_week_table('data_cleaned/household_activity_week.csv')
-circuit_table = import_circuit_table('data_cleaned/household_activity_circuit.csv')
+households = import_and_transform_households('data/foyers_traites.csv')
+#week_table = import_week_table('data/household_activity_week.csv')
+#circuit_table = import_circuit_table('data/household_activity_circuit.csv')
 
-households = merge_households(households, week_table, 
-                              circuit_table)
+#households = merge_households(households, week_table,  circuit_table)
 
-purchase_matrix, row_names, col_names = load_purchase_matrix('data_cleaned/purchase_table_full_weekly.npz', 
-                                                             'data_cleaned/households_week_matrix_full.txt', 
-                                                             'data_cleaned/products_matrix_full.txt')
+purchase_matrix, row_names, col_names = load_purchase_matrix('data/purchase_table_full.npz', 
+                                                             'data/households_matrix_full.txt', 
+                                                             'data/products_matrix_full.txt')
 
-products_table = pd.read_csv('data_cleaned/produits_achats.csv', encoding='latin1')
+products_table = pd.read_csv('data/produits_achats.csv', encoding='latin1')
 products_table = clean_table(products_table)
-cluster_table = pd.read_csv('data_cleaned/cluster_products_mano.csv', encoding='latin1')
+cluster_table = pd.read_csv('data/cluster_products_auto.csv', encoding='latin1')
 purchase_matrix,  col_names = cluster_products(cluster_table, products_table, purchase_matrix, col_names, verbose = True, )
 #purchase_matrix = csr_matrix((np.ones(len(purchase_matrix.data)), purchase_matrix.indices, purchase_matrix.indptr)).tocsc()
 
 purchase_matrix, col_names = trim_sparse_columns(purchase_matrix, col_names, 10)
-purchase_matrix, row_names = delete_max_rows(purchase_matrix, row_names, 70)
+#purchase_matrix, row_names = delete_max_rows(purchase_matrix, row_names, 70)
 purchase_matrix, row_names = delete_rows_entropy(purchase_matrix, row_names, 1.5)
 
 
@@ -63,11 +62,11 @@ model = LatentDirichletAllocation(n_topics=30, random_state=123, n_jobs = 1, max
 id_topic = model.fit_transform(purchase_matrix)    
 
 documents = pd.DataFrame(id_topic, index = row_names)
-documents.to_csv('data/documents_lda_mano_week.csv', index=False, )
+documents.to_csv('data/documents_lda_auto.csv', index=True )
 
 topics = model.components_.T
 topics = pd.DataFrame(topics, index = col_names)
-topics.to_csv('data/topics_lda_mano_week.csv', index = True)
+topics.to_csv('data/topics_lda_auto.csv', index = True)
 
 
 
@@ -140,6 +139,7 @@ topics.to_csv('data/topics_lda_mano_week.csv', index = True)
 #assert achats_households.shape[1] == len(list_products)
 #
 
+'''
 households['n_enf'] = households['en3'] + households['en6'] + households['en15'] + households['en25']
 households_trimed = households[['household', 'sexe', 'age','n_enf']]
 households_m = households_trimed.loc[households_trimed['sexe'] == 0]
@@ -172,6 +172,7 @@ topics = pd.DataFrame(topics, index = list_products)
 topics.to_csv('data/topics_lda_mano.csv', index = True)
 
 
+'''
 
 
 
@@ -180,8 +181,7 @@ topics.to_csv('data/topics_lda_mano.csv', index = True)
 
 
 
-
-
+'''
 
 def normalize_size_households(matrix, row_labels):
     
@@ -252,7 +252,7 @@ def normalise_products_purchase(matrix):
 
     return matrix
 
-
+'''
 
 '''
 def save_sparse_csr(filename, array):

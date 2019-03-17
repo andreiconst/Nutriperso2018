@@ -24,14 +24,14 @@ from foyers_processing import *
 from tools_clustering import *
 
 
-purchase_matrix, row_names_original, col_names_original = load_purchase_matrix('data_cleaned/purchase_table_full.npz', 
-                                                                 'data_cleaned/households_matrix_full.txt', 
-                                                                 'data_cleaned/products_matrix_full.txt')
+purchase_matrix, row_names_original, col_names_original = load_purchase_matrix('data/purchase_table_full.npz', 
+                                                                 'data/households_matrix_full.txt', 
+                                                                 'data/products_matrix_full.txt')
 
 
-products_table = pd.read_csv('data_cleaned/produits_achats.csv', encoding='latin1')
+products_table = pd.read_csv('data/produits_achats.csv', encoding='latin1')
 #cluster_table = pd.read_csv('data_cleaned/cluster_products_mano.csv', encoding='latin1')
-cluster_table = pd.read_csv('data_cleaned/cluster_products_mano.csv', encoding='latin1') #the other clustering proposed
+cluster_table = pd.read_csv('data/cluster_products_mano.csv', encoding='latin1') #the other clustering proposed
 
 
 purchase_matrix_clustered, col_names_clustered = cluster_products(cluster_table, products_table, purchase_matrix, col_names_original)
@@ -100,81 +100,6 @@ purchase_matrix_final = purchase_matrix_final[mask_hh,:]
 row_names_touse = [int(row_names_final[i]) for i in mask_hh]
 
 
-#q_headers = ['cn_1', 'cn_2', 'cn_3', 'cn_4']
-#for i in range(3,27):
-#    q_headers.append('c_'+str(i))
-#
-#Questions = list()
-#for h in q_headers:
-#    temp = list(set(products_table[h].dropna()))
-#    for qu in temp:
-#        Questions.append(qu)
-#questions = list(set(Questions))
-#
-#for i, q in enumerate(['groupe', 'sousgroupe', 'fabricant', 'marque', 'mdd', 'bio']):
-#    questions.insert(i,q)
-#    
-#question_str = ''
-#for el in questions:
-#    question_str += el +', '
-#
-#groupes = sorted(list(set(products_table['groupe'])))
-#groupes_str = ''
-#for g in groupes:
-#    groupes_str += g + ', '
-#
-# 
-#
-#subgroupes = sorted(list(set(products_table['sousgroupe'].loc[products_table['groupe']=='Viande'])))
-#subgroupes_str = ''
-#for g in subgroupes:
-#    subgroupes_str += g + ', '
-#
-#result_sousgroupe = list()
-#for g in groupes:
-#    sousgroupe = sorted(list(set(products_table['sousgroupe'].loc[products_table['groupe']==g])))
-#    temp = ''
-#    for ssg in sousgroupe:
-#        temp += ssg + ', '
-#    temp = temp[:-2]
-#    result_sousgroupe.append(temp)
-#    
-#division = pd.DataFrame([groupes, result_sousgroupe]).T
-#division.to_csv('divion_grpssgrp.csv')
-
-
-
-
-
-#u, s, vt = svds(purchase_matrix_final, 1000)
-#total_variance = np.dot(purchase_matrix_final.data.T, purchase_matrix_final.data)
-#new_s = s[-600:]
-#ratio_variance = np.dot(new_s, new_s.T)/ total_variance
-#
-#result = list()
-#values = [0,10,30,60,100,200,300,400,500,600,700,800,900,1000]
-#for i in values:
-#    new_s = s[-i:]
-#    temp = np.dot(new_s, new_s.T)/ total_variance
-#    result.append(temp)
-#result.insert(0,0)
-#
-#plt.figure(figsize=(10,6), dpi=80)
-#
-#plt.title('Captured Variance')
-#plt.xlabel('Nb dimensions')
-#plt.ylabel('Variance captured')
-#
-#plt.xlim(0,1000)
-#plt.ylim(0,1)
-#plt.plot(values, result, color="blue", linewidth=2.5, linestyle="-",)
-#
-#plt.savefig('variance_captured_svd.png')
-
-
-#final representation
-
-#result = list(set(row_names_touse) - set(household_names))
 
 sum(households['regionName'].isnull().values)
 

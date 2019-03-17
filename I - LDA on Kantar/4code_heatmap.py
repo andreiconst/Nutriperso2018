@@ -8,7 +8,10 @@ This is a temporary script file.
 
 import mpl_toolkits
 mpl_toolkits.__path__.append('/usr/lib/python3.6/dist-packages/mpl_toolkits/')
+import os
+os.environ["PROJ_LIB"] = "/home/andrei/anaconda3/share/proj/"; #fixr
 from mpl_toolkits.basemap import Basemap
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -18,7 +21,8 @@ from matplotlib.collections import LineCollection
 import pandas as pd
 
 import sys
-sys.path.insert(0, '/home/andrei/Desktop/kantar_2014/code_produits/')
+import os
+sys.path.insert(0, os.getcwd() + '/Tools/')
 from lda_interpretation__bis import *
 
 
@@ -86,7 +90,7 @@ def clean_records(records):
 def draw_map(dpts_dataframe,topic_index):
     m, ax = carte_france()
     
-    departements = 'DEPARTEMENT/DEPARTEMENT.shp'
+    departements = 'data/DEPARTEMENT/DEPARTEMENT.shp'
     shp = departements
     r = shapefile.Reader(shp)
     shapes = r.shapes()
@@ -130,7 +134,7 @@ def draw_map(dpts_dataframe,topic_index):
             ax.add_collection(lines)
         else:
             print("--- issue with", record[-1])
-    plt.savefig('heatmaps2/heatmap_topic' + str(topic_index) +'.png' )
+    plt.savefig('heatmaps/heatmap_topic' + str(topic_index) +'.png' )
 
 def import_households(list_columns, list_households):
     households = pd.read_csv('data/foyers_traites.csv')
@@ -142,8 +146,23 @@ def import_households(list_columns, list_households):
 # Charger les donnes pertinentes
 # =============================================================================
 
-lda_households = np.asarray(lda_documents)[:,6:]
+
+lda_documents_name = 'documents_lda_auto.csv'
+lda_topics_name = 'topics_lda_auto.csv'
+nb_topics = 30
+
+lda_topics = pd.read_csv('data/' + lda_topics_name, index_col = 0)
+lda_documents = pd.read_csv('data/' + lda_documents_name)
+
+products_table = pd.read_csv('data/produits_achats.csv',encoding = "latin1")
+products_table = clean_table(products_table)
+products_table = products_table.loc[products_table['product'].isin(list(lda_topics.index.values))]
+
+dictionary_description = create_dict_to_keep(sorted(list(products_table['sousgroupe'].drop_duplicates())))
+
+lda_households = np.asarray(lda_documents)[:,1:]
 list_households = list(np.asarray(lda_documents)[:,0])
+list_households = [int(i) for i in list_households]
 households = import_households(['household','dpts','thab'], list_households)
 
 for i in range(30):

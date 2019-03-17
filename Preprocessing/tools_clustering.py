@@ -223,6 +223,7 @@ def clustering_algo_simple_all(datatable, sousgroupes, cols_to_drop, dict_qval, 
     clustering_dict = dict()
     
     for sousgroupe in sousgroupes:
+        
         clustering_list = list()
         if advanced == False:
             clustering_interm = clustering_algo_simple_sousgroupe(datatable, sousgroupe, cols_to_drop, dict_qval)
